@@ -64,68 +64,96 @@ class AppBottomNavigationBar extends StatelessWidget {
                 children: List.generate(_items.length, (index) {
                   final item = _items[index];
                   final selected = index == selectedIndex;
-                  return Expanded(
-                    child: Semantics(
-                      selected: selected,
-                      label: item.label,
-                      button: true,
-                      child: Tooltip(
-                        message: item.label,
-                        child: InkWell(
-                          onTap: () => onDestinationSelected(index),
-                          borderRadius: BorderRadius.circular(28),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 280),
-                            curve: Curves.easeOutCubic,
-                            height: 52,
-                            decoration: BoxDecoration(
-                              gradient: selected
-                                  ? LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        Colors.white.withValues(alpha: 0.32),
-                                        AppColor.ink.withValues(alpha: 0.10),
-                                      ],
-                                    )
-                                  : null,
-                              borderRadius: BorderRadius.circular(28),
-                              border: selected
-                                  ? Border.all(
-                                      color: Colors.white.withValues(
-                                        alpha: 0.32,
-                                      ),
-                                    )
-                                  : null,
-                              boxShadow: selected
-                                  ? [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(
-                                          alpha: 0.07,
-                                        ),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 5),
-                                      ),
-                                    ]
-                                  : null,
-                            ),
-                            alignment: Alignment.center,
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 180),
-                              child: Icon(
-                                selected ? item.selectedIcon : item.icon,
-                                key: ValueKey('$index-$selected'),
-                                size: 26,
-                                color: selected
-                                    ? AppColor.primary
-                                    : AppColor.ink,
+                  return selected
+                      // ── Active pill: icon + label, intrinsic width ──
+                      ? Semantics(
+                          selected: true,
+                          label: item.label,
+                          button: true,
+                          child: InkWell(
+                            onTap: () => onDestinationSelected(index),
+                            borderRadius: BorderRadius.circular(28),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 280),
+                              curve: Curves.easeOutCubic,
+                              height: 52,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Colors.white.withValues(alpha: 0.32),
+                                    AppColor.ink.withValues(alpha: 0.10),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(28),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.32),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.07),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    item.selectedIcon,
+                                    size: 22,
+                                    color: AppColor.primary,
+                                  ),
+                                  const SizedBox(width: 7),
+                                  Text(
+                                    item.label,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColor.primary,
+                                      letterSpacing: 0.1,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                  );
+                        )
+                      // ── Inactive icon: fills remaining space equally ──
+                      : Expanded(
+                          child: Semantics(
+                            selected: false,
+                            label: item.label,
+                            button: true,
+                            child: Tooltip(
+                              message: item.label,
+                              child: InkWell(
+                                onTap: () => onDestinationSelected(index),
+                                borderRadius: BorderRadius.circular(28),
+                                child: SizedBox(
+                                  height: 52,
+                                  child: Center(
+                                    child: AnimatedSwitcher(
+                                      duration:
+                                          const Duration(milliseconds: 160),
+                                      child: Icon(
+                                        item.icon,
+                                        key: ValueKey(index),
+                                        size: 24,
+                                        color: AppColor.ink,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
                 }),
               ),
             ),
