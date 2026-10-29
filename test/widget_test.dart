@@ -11,6 +11,6 @@ import 'package:miiincare/app.dart';
 void main() {
   testWidgets('App smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(const Miiincare());
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 2));
   });
 }

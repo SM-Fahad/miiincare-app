@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:miiincare/core/shared_prefs_service/shared_preference_helper.dart';
 import 'package:miiincare/routes/app_routes.dart';
 
 class OnboardingController extends GetxController {
@@ -29,7 +30,7 @@ class OnboardingController extends GetxController {
 
   Future<void> next() async {
     if (isLastPage) {
-      finish();
+      await finish();
       return;
     }
     await pageController.nextPage(
@@ -38,7 +39,10 @@ class OnboardingController extends GetxController {
     );
   }
 
-  void finish() => Get.offAllNamed(AppRoutes.home);
+  Future<void> finish() async {
+    await SharedPreferencesHelper.setOnboardingSeen(true);
+    Get.offAllNamed(AppRoutes.home);
+  }
 
   @override
   void onClose() {

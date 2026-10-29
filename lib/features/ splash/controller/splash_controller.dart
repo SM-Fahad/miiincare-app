@@ -1,36 +1,35 @@
-
 import 'package:get/get.dart';
+import 'package:miiincare/core/shared_prefs_service/shared_preference_helper.dart';
+import 'package:miiincare/routes/app_routes.dart';
 
 class SplashController extends GetxController {
-  bool isLogin = false;  
-
-  Future<void> checkLoginStatus() async {
-    // final accessToken = await SharedPreferencesHelper.getAccessToken();
-    // final refreshToken = await SharedPreferencesHelper.getRefreshToken();
-
-    // if (accessToken != null &&
-    //     accessToken.isNotEmpty &&
-    //     refreshToken != null &&
-    //     refreshToken.isNotEmpty) {
-    //   isLogin = true;
-    // }
-  }
+  bool isLogin = false;
 
   @override
   void onInit() {
     super.onInit();
-    // navigationtoOnboarding();
+    navigateToNextScreen();
   }
 
-  // Future<void> navigationtoOnboarding() async {
-  //   Future.delayed(const Duration(seconds: 3), () async {
-  //     await checkLoginStatus();
-  //     if (isLogin) {
-  //       final profileService = ProfileService();
-  //       await profileService.handleUserRouting();
-  //     } else {
-  //       Get.offAllNamed(AppRoutes.onboarding);
-  //     }
-  //   });
-  // }
+  Future<void> checkLoginStatus() async {
+    final accessToken = await SharedPreferencesHelper.getAccessToken();
+    if (accessToken != null && accessToken.isNotEmpty) {
+      isLogin = true;
+    }
+  }
+
+  Future<void> navigateToNextScreen() async {
+    await Future.delayed(const Duration(milliseconds: 1600));
+
+    if (Get.currentRoute == AppRoutes.splash) {
+      final hasSeenOnboarding = await SharedPreferencesHelper.isOnboardingSeen();
+      await checkLoginStatus();
+
+      if (!hasSeenOnboarding) {
+        Get.offAllNamed(AppRoutes.onboarding);
+      } else {
+        Get.offAllNamed(AppRoutes.home);
+      }
+    }
+  }
 }

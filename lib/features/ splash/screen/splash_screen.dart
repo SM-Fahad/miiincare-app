@@ -2,18 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:miiincare/core/constants/app_color.dart';
 import 'package:miiincare/core/constants/image_path.dart';
-import 'package:miiincare/routes/app_routes.dart';
+import 'package:miiincare/features/%20splash/controller/splash_controller.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Future<void>.delayed(const Duration(milliseconds: 1600), () {
-      if (Get.currentRoute == AppRoutes.splash) {
-        Get.offAllNamed(AppRoutes.onboarding);
-      }
-    });
+    Get.isRegistered<SplashController>()
+        ? Get.find<SplashController>()
+        : Get.put(SplashController());
+
     return Scaffold(
       body: Container(
         width: double.infinity,
