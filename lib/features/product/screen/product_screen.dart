@@ -5,7 +5,7 @@ import 'package:miiincare/core/constants/app_color.dart';
 import 'package:miiincare/features/cart/controller/cart_controller.dart';
 import 'package:miiincare/features/catalog/model/product_model.dart';
 import 'package:miiincare/features/product/controller/product_controller.dart';
-import 'package:miiincare/routes/app_routes.dart';
+// import 'package:miiincare/routes/app_routes.dart';
 
 class ProductScreen extends StatelessWidget {
   const ProductScreen({super.key});
@@ -23,16 +23,16 @@ class ProductScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: AppColor.background,
           title: const Text('Product details'),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: IconButton(
-                tooltip: 'Open bag',
-                onPressed: () => Get.offAllNamed(AppRoutes.home, arguments: 3),
-                icon: const Icon(Icons.shopping_bag_outlined),
-              ),
-            ),
-          ],
+          // actions: [
+          //   Padding(
+          //     padding: const EdgeInsets.only(right: 8),
+          //     child: IconButton(
+          //       tooltip: 'Open bag',
+          //       onPressed: () => Get.offAllNamed(AppRoutes.checkout, arguments: 3),
+          //       icon: const Icon(Icons.shopping_bag_outlined),
+          //     ),
+          //   ),
+          // ],
         ),
         bottomNavigationBar: SafeArea(
           child: Padding(
