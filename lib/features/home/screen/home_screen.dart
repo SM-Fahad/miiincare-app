@@ -90,9 +90,7 @@ class _HomeTab extends StatelessWidget {
       onRefresh: catalog.load,
       child: CustomScrollView(
         slivers: [
-          const SliverToBoxAdapter(
-            child: _AnnouncementBar(),
-          ),
+          const SliverToBoxAdapter(child: _AnnouncementBar()),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             sliver: SliverToBoxAdapter(
@@ -155,9 +153,7 @@ class _HomeTab extends StatelessWidget {
               child: _HeroCarousel(controller: controller, onShop: onShop),
             ),
           ),
-          const SliverToBoxAdapter(
-            child: _TrustBenefitsStrip(),
-          ),
+          const SliverToBoxAdapter(child: _TrustBenefitsStrip()),
           SliverToBoxAdapter(
             child: _CategoryPillsStrip(catalog: catalog, onShop: onShop),
           ),
@@ -369,10 +365,7 @@ class _TrustBenefitsStrip extends StatelessWidget {
 }
 
 class _CategoryPillsStrip extends StatelessWidget {
-  const _CategoryPillsStrip({
-    required this.catalog,
-    required this.onShop,
-  });
+  const _CategoryPillsStrip({required this.catalog, required this.onShop});
 
   final CatalogController catalog;
   final VoidCallback onShop;
@@ -582,33 +575,44 @@ class _SelfCareBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 28, 20, 10),
-      decoration: BoxDecoration(
-        color: AppColor.softLavender,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColor.border),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
+    return Padding(
+      padding: const EdgeInsets.only(top: 32, bottom: 16),
+      child: SizedBox(
+        width: double.infinity,
+        height: 270,
+        child: Container(
+          color: const Color(0xFFF7F3FC),
+          child: Stack(
         children: [
-          Positioned(
-            right: -25,
-            bottom: -25,
-            width: 175,
-            height: 175,
-            child: Opacity(
-              opacity: 0.8,
-              child: Image.asset(
-                ImagePath.midSection,
-                fit: BoxFit.contain,
+          Positioned.fill(
+            child: Image.asset(
+              ImagePath.midSection,
+              fit: BoxFit.cover,
+              alignment: Alignment.centerRight,
+            ),
+          ),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    const Color(0xFFF7F3FC),
+                    const Color(0xFFF7F3FC).withValues(alpha: 0.96),
+                    const Color(0xFFF7F3FC).withValues(alpha: 0.68),
+                    const Color(0xFFF7F3FC).withValues(alpha: 0.15),
+                  ],
+                  stops: const [0.0, 0.45, 0.70, 1.0],
+                ),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(22, 26, 22, 26),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
               children: [
                 const Text(
                   'SELF CARE ISN’T SELFISH',
@@ -616,62 +620,67 @@ class _SelfCareBanner extends StatelessWidget {
                     fontSize: 10.5,
                     fontWeight: FontWeight.w700,
                     color: AppColor.primary,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                const SizedBox(
-                  width: 210,
-                  child: Text(
-                    'Indulge in Everyday\nSelf Care',
-                    style: TextStyle(
-                      fontSize: 21,
-                      fontWeight: FontWeight.w800,
-                      height: 1.2,
-                      color: AppColor.ink,
-                    ),
+                    letterSpacing: 1.3,
                   ),
                 ),
                 const SizedBox(height: 8),
+                const Text(
+                  'Indulge in Everyday\nSelf Care',
+                  style: TextStyle(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w800,
+                    height: 1.2,
+                    color: AppColor.ink,
+                  ),
+                ),
+                const SizedBox(height: 10),
                 const SizedBox(
-                  width: 200,
+                  width: 210,
                   child: Text(
                     'Pamper your skin with our nourishing formulas that bring out your natural glow.',
                     style: TextStyle(
-                      fontSize: 12,
-                      height: 1.35,
+                      fontSize: 12.5,
+                      height: 1.4,
                       color: AppColor.muted,
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                FilledButton.icon(
+                const SizedBox(height: 18),
+                FilledButton(
                   onPressed: onShop,
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColor.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
+                      horizontal: 20,
+                      vertical: 12,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  icon: const Text(
-                    'DISCOVER MORE',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.8,
-                    ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'DISCOVER MORE',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                      SizedBox(width: 6),
+                      Icon(Icons.arrow_forward_rounded, size: 14),
+                    ],
                   ),
-                  label: const Icon(Icons.arrow_forward_rounded, size: 14),
                 ),
               ],
             ),
           ),
         ],
+      ),
+        ),
       ),
     );
   }
@@ -857,7 +866,7 @@ class _ShopTab extends StatelessWidget {
               children: [
                 ChoiceChip(
                   label: const Text('All'),
-                  selected: catalog.selectedCategorySlug.isEmpty,
+                  selected: catalog.selectedCategorySlug.value.isEmpty,
                   onSelected: (_) => catalog.filterBy(null),
                 ),
                 ...catalog.categories.map(
