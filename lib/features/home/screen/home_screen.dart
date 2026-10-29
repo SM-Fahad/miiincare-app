@@ -6,6 +6,7 @@ import 'package:miiincare/features/auth/account/controller/auth_controller.dart'
 import 'package:miiincare/features/cart/controller/cart_controller.dart';
 import 'package:miiincare/features/cart/model/cart_model.dart';
 import 'package:miiincare/features/catalog/controller/catalog_controller.dart';
+import 'package:miiincare/features/catalog/model/product_model.dart';
 import 'package:miiincare/features/home/controller/home_controller.dart';
 import 'package:miiincare/features/home/widgets/app_bottom_navigation_bar.dart';
 import 'package:miiincare/features/home/widgets/product_card.dart';
@@ -89,6 +90,9 @@ class _HomeTab extends StatelessWidget {
       onRefresh: catalog.load,
       child: CustomScrollView(
         slivers: [
+          const SliverToBoxAdapter(
+            child: _AnnouncementBar(),
+          ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             sliver: SliverToBoxAdapter(
@@ -151,69 +155,526 @@ class _HomeTab extends StatelessWidget {
               child: _HeroCarousel(controller: controller, onShop: onShop),
             ),
           ),
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(20, 28, 20, 14),
-            sliver: SliverToBoxAdapter(
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: Text(
-                      'Best sellers',
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () => Get.toNamed(AppRoutes.bestSellers),
-                    child: const Text('See all'),
-                  ),
-                ],
-              ),
-            ),
+          const SliverToBoxAdapter(
+            child: _TrustBenefitsStrip(),
           ),
-          Obx(() {
-            if (catalog.isLoading.value) {
-              return const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
-              );
-            }
-            if (catalog.error.isNotEmpty) {
-              return SliverToBoxAdapter(
-                child: _ErrorMessage(
+          SliverToBoxAdapter(
+            child: _CategoryPillsStrip(catalog: catalog, onShop: onShop),
+          ),
+          SliverToBoxAdapter(
+            child: Obx(() {
+              if (catalog.isLoading.value && catalog.products.isEmpty) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+              if (catalog.error.isNotEmpty && catalog.products.isEmpty) {
+                return _ErrorMessage(
                   message: catalog.error.value,
                   retry: catalog.load,
-                ),
+                );
+              }
+
+              final isSectionsLoading = catalog.sectionsLoading.value;
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _HomeProductSection(
+                    eyebrow: 'MOST LOVED',
+                    title: 'Bestsellers',
+                    products: catalog.bestSellers.toList(),
+                    isLoading: isSectionsLoading && catalog.bestSellers.isEmpty,
+                    onViewAll: () => Get.toNamed(AppRoutes.bestSellers),
+                  ),
+                  _HomeProductSection(
+                    eyebrow: 'VALUE BUNDLES',
+                    title: 'Combo Packs',
+                    products: catalog.combos.toList(),
+                    isLoading: isSectionsLoading && catalog.combos.isEmpty,
+                    onViewAll: () {
+                      catalog.selectBundleAndFilter();
+                      onShop();
+                    },
+                  ),
+                  _HomeProductSection(
+                    eyebrow: 'DAILY ESSENTIALS',
+                    title: 'Skin Care',
+                    products: catalog.skinCare.toList(),
+                    isLoading: isSectionsLoading && catalog.skinCare.isEmpty,
+                    onViewAll: () {
+                      catalog.selectCategoryAndFilter('skin-care');
+                      onShop();
+                    },
+                  ),
+                  _HomeProductSection(
+                    eyebrow: 'POTENT ACTIVES',
+                    title: 'Serums',
+                    products: catalog.serums.toList(),
+                    isLoading: isSectionsLoading && catalog.serums.isEmpty,
+                    onViewAll: () {
+                      catalog.selectCategoryAndFilter('serum');
+                      onShop();
+                    },
+                  ),
+                  _HomeProductSection(
+                    eyebrow: 'GENTLE CLEANSING',
+                    title: 'Face Wash',
+                    products: catalog.faceWash.toList(),
+                    isLoading: isSectionsLoading && catalog.faceWash.isEmpty,
+                    onViewAll: () {
+                      catalog.selectCategoryAndFilter('face-wash');
+                      onShop();
+                    },
+                  ),
+                  _HomeProductSection(
+                    eyebrow: 'SCALP TO LENGTHS',
+                    title: 'Hair Care',
+                    products: catalog.hairCare.toList(),
+                    isLoading: isSectionsLoading && catalog.hairCare.isEmpty,
+                    onViewAll: () {
+                      catalog.selectCategoryAndFilter('hair-care');
+                      onShop();
+                    },
+                  ),
+                  _HomeProductSection(
+                    eyebrow: 'HEAD TO TOE',
+                    title: 'Body Essentials',
+                    products: catalog.bodyEssentials.toList(),
+                    isLoading:
+                        isSectionsLoading && catalog.bodyEssentials.isEmpty,
+                    onViewAll: () {
+                      catalog.selectCategoryAndFilter('body-essentials');
+                      onShop();
+                    },
+                  ),
+                  _HomeProductSection(
+                    eyebrow: 'BEAUTY FROM WITHIN',
+                    title: 'Supplements',
+                    products: catalog.supplements.toList(),
+                    isLoading: isSectionsLoading && catalog.supplements.isEmpty,
+                    onViewAll: () {
+                      catalog.selectCategoryAndFilter('supplements');
+                      onShop();
+                    },
+                  ),
+                  _HomeProductSection(
+                    eyebrow: 'TARGETED ILLUMINATION',
+                    title: 'Eye Care',
+                    products: catalog.eyeCare.toList(),
+                    isLoading: isSectionsLoading && catalog.eyeCare.isEmpty,
+                    onViewAll: () {
+                      catalog.selectCategoryAndFilter('eye-care');
+                      onShop();
+                    },
+                  ),
+                  _SelfCareBanner(onShop: onShop),
+                  const SizedBox(
+                    height: AppBottomNavigationBar.contentClearance,
+                  ),
+                ],
               );
-            }
-            return SliverPadding(
-              padding: const EdgeInsets.fromLTRB(
-                20,
-                0,
-                20,
-                AppBottomNavigationBar.contentClearance,
-              ),
-              sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 14,
-                  mainAxisSpacing: 14,
-                  childAspectRatio: .62,
-                ),
-                delegate: SliverChildBuilderDelegate(
-                  (_, i) => ProductCard(product: catalog.products[i]),
-                  childCount: catalog.products.length > 6
-                      ? 6
-                      : catalog.products.length,
-                ),
-              ),
-            );
-          }),
+            }),
+          ),
         ],
       ),
     ),
   );
+}
+
+class _AnnouncementBar extends StatelessWidget {
+  const _AnnouncementBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 12),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF5A3192), Color(0xFF7453A6)],
+        ),
+      ),
+      child: const Center(
+        child: Text(
+          '🚚 FREE SHIPPING ON ORDERS OVER ৳2,999  •  AUTHENTIC SKINCARE',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 9.5,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.8,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TrustBenefitsStrip extends StatelessWidget {
+  const _TrustBenefitsStrip();
+
+  static const _benefits = [
+    (Icons.verified_outlined, '100% Authentic'),
+    (Icons.biotech_outlined, 'Dermatologist Tested'),
+    (Icons.cruelty_free_outlined, 'Cruelty Free'),
+    (Icons.shield_outlined, 'Zero Toxins'),
+    (Icons.eco_outlined, 'Eco-Friendly'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 14, 20, 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColor.border),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: _benefits.map((b) {
+            final isLast = b == _benefits.last;
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(b.$1, size: 15, color: AppColor.primary),
+                const SizedBox(width: 5),
+                Text(
+                  b.$2,
+                  style: const TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.ink,
+                  ),
+                ),
+                if (!isLast) ...[
+                  const SizedBox(width: 12),
+                  Container(
+                    width: 1,
+                    height: 12,
+                    color: AppColor.border,
+                    margin: const EdgeInsets.only(right: 12),
+                  ),
+                ],
+              ],
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+class _CategoryPillsStrip extends StatelessWidget {
+  const _CategoryPillsStrip({
+    required this.catalog,
+    required this.onShop,
+  });
+
+  final CatalogController catalog;
+  final VoidCallback onShop;
+
+  static const _quickCategories = [
+    ('All', ''),
+    ('Skin Care', 'skin-care'),
+    ('Combo Packs', 'bundle'),
+    ('Serums', 'serum'),
+    ('Face Wash', 'face-wash'),
+    ('Hair Care', 'hair-care'),
+    ('Body Essentials', 'body-essentials'),
+    ('Supplements', 'supplements'),
+    ('Eye Care', 'eye-care'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 36,
+      child: Obx(() {
+        final selectedSlug = catalog.selectedCategorySlug.value;
+        return ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          itemCount: _quickCategories.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 8),
+          itemBuilder: (_, i) {
+            final item = _quickCategories[i];
+            final isSelected = item.$2.isEmpty
+                ? selectedSlug.isEmpty
+                : selectedSlug == item.$2;
+
+            return InkWell(
+              borderRadius: BorderRadius.circular(18),
+              onTap: () {
+                if (item.$2.isEmpty) {
+                  catalog.filterBy(null);
+                } else if (item.$2 == 'bundle') {
+                  catalog.selectBundleAndFilter();
+                } else {
+                  catalog.selectCategoryAndFilter(item.$2);
+                }
+                onShop();
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 13,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColor.primary : Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: isSelected ? AppColor.primary : AppColor.border,
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    item.$1,
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w500,
+                      color: isSelected ? Colors.white : AppColor.ink,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      }),
+    );
+  }
+}
+
+class _HomeProductSection extends StatelessWidget {
+  const _HomeProductSection({
+    required this.eyebrow,
+    required this.title,
+    required this.products,
+    required this.isLoading,
+    required this.onViewAll,
+  });
+
+  final String eyebrow;
+  final String title;
+  final List<ProductModel> products;
+  final bool isLoading;
+  final VoidCallback onViewAll;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!isLoading && products.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 24, 20, 10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      eyebrow.toUpperCase(),
+                      style: const TextStyle(
+                        color: AppColor.primary,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: AppColor.ink,
+                        fontSize: 21,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              InkWell(
+                onTap: onViewAll,
+                borderRadius: BorderRadius.circular(4),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'SHOP ALL',
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8,
+                          color: AppColor.ink,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 13,
+                        color: AppColor.ink,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 275,
+          child: isLoading
+              ? ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: 4,
+                  separatorBuilder: (_, _) => const SizedBox(width: 14),
+                  itemBuilder: (_, _) => Container(
+                    width: 168,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColor.border),
+                    ),
+                    child: const Center(
+                      child: SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    ),
+                  ),
+                )
+              : ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: products.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 14),
+                  itemBuilder: (_, i) => SizedBox(
+                    width: 168,
+                    child: ProductCard(product: products[i]),
+                  ),
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SelfCareBanner extends StatelessWidget {
+  const _SelfCareBanner({required this.onShop});
+  final VoidCallback onShop;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(20, 28, 20, 10),
+      decoration: BoxDecoration(
+        color: AppColor.softLavender,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColor.border),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          Positioned(
+            right: -25,
+            bottom: -25,
+            width: 175,
+            height: 175,
+            child: Opacity(
+              opacity: 0.8,
+              child: Image.asset(
+                ImagePath.midSection,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'SELF CARE ISN’T SELFISH',
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w700,
+                    color: AppColor.primary,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const SizedBox(
+                  width: 210,
+                  child: Text(
+                    'Indulge in Everyday\nSelf Care',
+                    style: TextStyle(
+                      fontSize: 21,
+                      fontWeight: FontWeight.w800,
+                      height: 1.2,
+                      color: AppColor.ink,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const SizedBox(
+                  width: 200,
+                  child: Text(
+                    'Pamper your skin with our nourishing formulas that bring out your natural glow.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 1.35,
+                      color: AppColor.muted,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                FilledButton.icon(
+                  onPressed: onShop,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColor.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  icon: const Text(
+                    'DISCOVER MORE',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                  label: const Icon(Icons.arrow_forward_rounded, size: 14),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _HeroCarousel extends StatelessWidget {

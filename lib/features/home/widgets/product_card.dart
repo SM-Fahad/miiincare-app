@@ -22,31 +22,65 @@ class ProductCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: Container(
-              width: double.infinity,
-              margin: const EdgeInsets.all(7),
-              decoration: BoxDecoration(
-                // color: AppColor.softLavender,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: product.image.isEmpty
-                  ? const Icon(
-                      Icons.spa_outlined,
-                      color: AppColor.lavender,
-                      size: 52,
-                    )
-                  : ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        product.image,
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, _, _) => const Icon(
+            child: Stack(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  margin: const EdgeInsets.all(7),
+                  child: product.image.isEmpty
+                      ? const Icon(
                           Icons.spa_outlined,
                           color: AppColor.lavender,
                           size: 52,
+                        )
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            product.image,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, _, _) => const Icon(
+                              Icons.spa_outlined,
+                              color: AppColor.lavender,
+                              size: 52,
+                            ),
+                          ),
+                        ),
+                ),
+                if (product.isBundle ||
+                    product.isBestSeller ||
+                    (product.compareAtPrice != null &&
+                        product.compareAtPrice! > product.price))
+                  Positioned(
+                    top: 10,
+                    left: 10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: product.isBundle
+                            ? const Color(0xFF2B7A58)
+                            : (product.isBestSeller
+                                ? AppColor.primary
+                                : const Color(0xFFC68A1B)),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        product.isBundle
+                            ? 'COMBO'
+                            : (product.isBestSeller ? 'BESTSELLER' : 'SALE'),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ),
+                  ),
+              ],
             ),
           ),
           Padding(
@@ -82,12 +116,32 @@ class ProductCard extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    'BDT ${product.price.toStringAsFixed(0)}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                    ),
+                  child: Row(
+                    children: [
+                      Text(
+                        '৳${product.price.toStringAsFixed(0)}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: AppColor.ink,
+                        ),
+                      ),
+                      if (product.compareAtPrice != null &&
+                          product.compareAtPrice! > product.price) ...[
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            '৳${product.compareAtPrice!.toStringAsFixed(0)}',
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              decoration: TextDecoration.lineThrough,
+                              fontSize: 10.5,
+                              color: AppColor.muted,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 const Icon(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:miiincare/core/constants/app_color.dart';
 import 'package:miiincare/features/cart/controller/cart_controller.dart';
@@ -42,10 +43,9 @@ class ProductScreen extends StatelessWidget {
                   : () async {
                       final added = await cartController.add(product.id);
                       if (added) {
-                        Get.snackbar(
-                          'Added to bag',
-                          product.name,
-                          snackPosition: SnackPosition.BOTTOM,
+                        EasyLoading.showSuccess(
+                          'Added to bag ${product.name}',
+                          // duration: const Duration(seconds: 2),
                         );
                       }
                     },

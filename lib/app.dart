@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:miiincare/routes/app_routes.dart';
@@ -22,6 +23,7 @@ class Miiincare extends StatelessWidget {
       ),
       initialRoute: initialRoute,
       getPages: AppRoutes.routes,
+      builder: EasyLoading.init(),
     );
   }
 }

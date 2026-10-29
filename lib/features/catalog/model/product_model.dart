@@ -19,6 +19,7 @@ class ProductModel {
     this.rating = 0,
     this.reviewCount = 0,
     this.isBestSeller = false,
+    this.isBundle = false,
   });
 
   final int id;
@@ -40,6 +41,7 @@ class ProductModel {
   final double rating;
   final int reviewCount;
   final bool isBestSeller;
+  final bool isBundle;
 
   factory ProductModel.fromJson(Map<String, dynamic> json) => ProductModel(
     id: int.tryParse('${json['id'] ?? 0}') ?? 0,
@@ -63,6 +65,7 @@ class ProductModel {
     rating: double.tryParse('${json['rating'] ?? 0}') ?? 0,
     reviewCount: int.tryParse('${json['reviewCount'] ?? 0}') ?? 0,
     isBestSeller: json['isBestSeller'] == true,
+    isBundle: json['isBundle'] == true,
   );
 
   static List<String> _strings(dynamic value) => value is List

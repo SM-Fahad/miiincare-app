@@ -12,6 +12,7 @@ class CatalogService {
     String? category,
     String? search,
     bool? bestSeller,
+    bool? bundle,
     String sort = 'featured',
     int page = 1,
     int perPage = 40,
@@ -20,6 +21,7 @@ class CatalogService {
       if (category != null && category.isNotEmpty) 'category': category,
       if (search != null && search.isNotEmpty) 'search': search,
       if (bestSeller != null) 'bestSeller': '$bestSeller',
+      if (bundle != null) 'bundle': '$bundle',
       'sort': sort,
       'page': '$page',
       'perPage': '$perPage',
@@ -30,8 +32,16 @@ class CatalogService {
     return ProductListModel.fromJson(Map<String, dynamic>.from(raw)).items;
   }
 
-  Future<List<ProductModel>> getBestSellers() =>
-      getProducts(bestSeller: true, perPage: 20);
+  Future<List<ProductModel>> getBestSellers({int perPage = 10}) =>
+      getProducts(bestSeller: true, perPage: perPage);
+
+  Future<List<ProductModel>> getCombos({int perPage = 10}) =>
+      getProducts(bundle: true, perPage: perPage);
+
+  Future<List<ProductModel>> getCategoryProducts(
+    String category, {
+    int perPage = 10,
+  }) => getProducts(category: category, perPage: perPage);
 
   Future<List<CategoryModel>> getCategories() async {
     final raw = await _client.get(ApiEndPoint.categories);
